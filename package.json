@@ -1,10 +1,10 @@
 {
-  "name": "memebot",
+  "name": "MonkeyBot",
   "version": "1.0.0",
-  "description": "A dank bot",
+  "description": "A monkey bot",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js",    
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

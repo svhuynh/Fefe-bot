@@ -17,7 +17,13 @@ client.on('message', async message => {
     if(message.channel.type === "dm") return;
 
     let messageArray = message.content.split(" ");
-    let cmd = messageArray[0]
+    let cmd = messageArray[0];
+    let args = messageArray.slice(1);
+
+    if(cmd === `${prefix}hello`){
+        return message.channel.send(`Hello ${message.author.username}`);
+    }
+
 
 });
 
