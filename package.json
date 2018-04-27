@@ -1,0 +1,16 @@
+{
+  "name": "memebot",
+  "version": "1.0.0",
+  "description": "A dank bot",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",    
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.3.2",
+    "nodemon": "^1.17.3"
+  }
+}
