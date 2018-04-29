@@ -1,8 +1,11 @@
 const tokenConfig = require("./token.json");
 const botConfig = require("./config.json");
 const Discord = require('discord.js');
+var filterManager = require('./command_managers/filter');
 
 const client  = new Discord.Client();
+
+var filteredChannels = [];
 
 client.on('ready', async () => {
     console.log(`${client.user.username} is online!`);
@@ -17,11 +20,19 @@ client.on('message', async message => {
     if(message.channel.type === "dm") return;
 
     let messageArray = message.content.split(" ");
-    let cmd = messageArray[0];
-    let args = messageArray.slice(1);
+    const args = message.content.slice(botConfig.prefix.length).trim().split(/ +/g);
+    const command = args.shift().toLowerCase();
 
-    if(cmd === `${prefix}hello`){
-        return message.channel.send(`Hello ${message.author.username}`);
+    switch (cmd) {
+        case "hello":
+            return message.channel.send(`Hello ${message.author.username}`);
+            break;
+        case "filter":
+            filterManager.run(client, args, filteredChannels);
+            break;
+    
+        default:
+            break;
     }
 
 
