@@ -6,7 +6,8 @@ function play(connection, message) {
 }
 function localPlay(client, message) {
     const broadcast = client.createVoiceBroadcast();
-    broadcast.playFile("../Animal Crossing - Tom Nook's Theme.mp3");
+    console.log('here');
+    broadcast.playFile("./Animal Crossing - Tom Nook's Theme.mp3");
     for(const connection of client.voiceConnections.values()){
         connection.playBroadcast(broadcast);
     }
@@ -19,7 +20,7 @@ module.exports.run = async (client, message, args) => {
     } else {
         if (!message.guild.voiceConnection) {
             message.member.voiceChannel.join().then(function (connection) {
-                //console.log("lol");
+                localPlay(client, message);
             });
         }
     }
