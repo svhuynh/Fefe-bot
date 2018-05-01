@@ -12,6 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.3.2",
-    "nodemon": "^1.17.3"
+    "ffmpeg": "0.0.4",
+    "nodemon": "^1.17.3",
+    "ytdl-core": "^0.20.2"
   }
 }

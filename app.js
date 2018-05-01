@@ -7,6 +7,8 @@ const client  = new Discord.Client({disableEveryone: true});
 
 client.commands = new Discord.Collection();
 
+var servers = {};
+
 fs.readdir('./command_managers/', (err, files) =>{
     if(err){
         //TODO: Add a logger
@@ -41,15 +43,16 @@ client.on('message', async message => {
     if(message.author.bot) return;
     // Ignore private messages
     if(message.channel.type === "dm") return;
-    //TODO: Check if message must be filtered
+    // TODO: Check if message must be filtered
 
     let messageArray = message.content.split(" ");
     const args = message.content.slice(botConfig.prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
 
+    // Run matching command file
     let commandFile = client.commands.get(command);
     if(commandFile) {
-        console.log("FOund");
+        console.log("Found.");
         commandFile.run(client, message, args);
     }
 
