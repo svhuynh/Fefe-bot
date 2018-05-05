@@ -8,15 +8,35 @@ const client  = new Discord.Client({disableEveryone: true});
 client.commands = new Discord.Collection();
 
 var queue = [];
+var currentDispatcher = null;
 
 const soundCommands = ["m", "nook"];
+const NOOK_FILE = "Animal Crossing - Tom Nook's Theme.mp3";
+const MONKEY_FILE = "monkey_sound_effect.mp3";
 
 // Plays a local sound file
-function localPlay(client, message, fileName) {
+function localPlay(client) {
+    let fileName = queue.shift();
+    console.log(queue);
     const broadcast = client.createVoiceBroadcast();
     broadcast.playFile(`./${fileName}`);
     for (const connection of client.voiceConnections.values()) {
-        connection.playBroadcast(broadcast);
+        currentDispatcher = connection.playBroadcast(broadcast);
+    }
+    // localPlay(client);
+    // currentDispatcher.on("end", function(){
+    //     // if (queue[0]) {
+    //     //     localPlay(client);
+    //     // } else {            
+    //         for (const connection of client.voiceConnections.values()) {
+    //             connection.disconnect();
+    //         }
+    //     //}
+    // })
+     if (queue[0]) {
+            localPlay(client);
+    } else {            
+        return;
     }
 }
 
@@ -55,33 +75,44 @@ client.on('message', async message => {
     if(message.author.bot) return;
     // Ignore private messages
     if(message.channel.type === "dm") return;
+
     // TODO: Check if message must be filtered
 
     let messageArray = message.content.split(" ");
     const args = message.content.slice(botConfig.prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
-
+    
+   
     // Check for soundboard command first
     if(soundCommands.includes(command)) {
+        //Add sound to queue 
+        switch (command) {
+            case "nook":
+                queue.push(NOOK_FILE);
+                break;
+            case "m":
+                queue.push(MONKEY_FILE);
+                break;
+            default:
+                break;
+        }
+        
         if (!message.member.voiceChannel) {
             message.channel.send("Go in a voice channel, dummy.");
             return;
         } else {
             if (!message.guild.voiceConnection) {
                 message.member.voiceChannel.join().then(function (connection) {
-                    switch (command) {
-                        case "nook":
-                            localPlay(client, message, "Animal Crossing - Tom Nook's Theme.mp3");
-                            break;
-                        case "m":
-                            localPlay(client, message, "monkey_sound_effect.mp3");
-                            break;
-                        default:
-                            break;
-                    }
                     message.delete(10);
+                    localPlay(client);                                
                 });
+            } else {
+                if(queue.length !== 0)
+                    localPlay(client);
+                else
+                    return;
             }
+            
         }
     }
     
