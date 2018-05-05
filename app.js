@@ -15,7 +15,7 @@ const NOOK_FILE = "Animal Crossing - Tom Nook's Theme.mp3";
 const MONKEY_FILE = "monkey_sound_effect.mp3";
 
 // Plays a local sound file
-function localPlay(client) {
+function localPlay(client, message) {
     let fileName = queue.shift();
     console.log(queue);
     const broadcast = client.createVoiceBroadcast();
@@ -70,62 +70,64 @@ client.on('ready', async () => {
 
 // On message reception
 client.on('message', async message => {
+
     let prefix = botConfig.prefix;
-    // Ignore bot messages
-    if(message.author.bot) return;
-    // Ignore private messages
-    if(message.channel.type === "dm") return;
-
-    // TODO: Check if message must be filtered
-
     let messageArray = message.content.split(" ");
-    const args = message.content.slice(botConfig.prefix.length).trim().split(/ +/g);
-    const command = args.shift().toLowerCase();
     
-   
-    // Check for soundboard command first
-    if(soundCommands.includes(command)) {
-        //Add sound to queue 
-        switch (command) {
-            case "nook":
-                queue.push(NOOK_FILE);
-                break;
-            case "m":
-                queue.push(MONKEY_FILE);
-                break;
-            default:
-                break;
-        }
+    if(messageArray[0].charAt(0) === prefix){
+        // Ignore bot messages
+        if(message.author.bot) return;
+        // Ignore private messages
+        if(message.channel.type === "dm") return;
+
+        // TODO: Check if message must be filtered
+
+        const args = message.content.slice(botConfig.prefix.length).trim().split(/ +/g);
+        const command = args.shift().toLowerCase();
         
-        if (!message.member.voiceChannel) {
-            message.channel.send("Go in a voice channel, dummy.");
-            return;
-        } else {
-            if (!message.guild.voiceConnection) {
-                message.member.voiceChannel.join().then(function (connection) {
-                    message.delete(10);
-                    localPlay(client);                                
-                });
-            } else {
-                if(queue.length !== 0)
-                    localPlay(client);
-                else
-                    return;
+    
+        // Check for soundboard command first
+        if(soundCommands.includes(command)) {
+            //Add sound to queue 
+            switch (command) {
+                case "nook":
+                    queue.push(NOOK_FILE);
+                    break;
+                case "m":
+                    queue.push(MONKEY_FILE);
+                    break;
+                default:
+                    break;
             }
             
+            if (!message.member.voiceChannel) {
+                message.channel.send("Go in a voice channel, dummy.");
+                return;
+            } else {
+                if (!message.guild.voiceConnection) {
+                    message.member.voiceChannel.join().then(function (connection) {
+                        localPlay(client);                                
+                    });
+                } else {
+                    if(queue.length !== 0)
+                        localPlay(client);
+                    else
+                        return;
+                }
+                
+            }
         }
-    }
-    
 
-    // Run matching command file
-    let commandFile = client.commands.get(command);
-    if(commandFile) {
-        commandFile.run(client, message, args);
+        // Run matching command file
+        let commandFile = client.commands.get(command);
+        if(commandFile) {
+            commandFile.run(client, message, args);
+        }
+        if(command == "stop") {
+            queue = [];
+        }
+        message.delete(10);    
     }
-    if(command == "stop") {
-        queue = [];
-    }
-
 });
 
 client.login(tokenConfig.token);
