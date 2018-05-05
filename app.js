@@ -14,7 +14,6 @@ const soundCommands = ["m", "nook"];
 // Plays a local sound file
 function localPlay(client, message, fileName) {
     const broadcast = client.createVoiceBroadcast();
-    console.log('here');
     broadcast.playFile(`./${fileName}`);
     for (const connection of client.voiceConnections.values()) {
         connection.playBroadcast(broadcast);
@@ -90,7 +89,6 @@ client.on('message', async message => {
     // Run matching command file
     let commandFile = client.commands.get(command);
     if(commandFile) {
-        console.log("Found.");
         commandFile.run(client, message, args);
     }
     if(command == "stop") {
