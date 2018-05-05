@@ -1,12 +1,11 @@
 module.exports.run = async (client, message, args) => {
     
-
-message.member.voiceChannel.disconnect();
     for (const connection of client.voiceConnections.values()) {
-        connection.playBroadcast(broadcast);
+        connection.disconnect();
     }
+    message.delete(10);
 }
 
 module.exports.help = {
-    name: "dc"
+    name: "stop"
 }
