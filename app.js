@@ -101,7 +101,8 @@ client.on('message', async message => {
             }
             
             if (!message.member.voiceChannel) {
-                message.channel.send("Go in a voice channel, dummy.");
+                message.channel.send(`${message.author.username}, go in a voice channel, you monkey.`);
+                message.delete(10);
                 return;
             } else {
                 if (!message.guild.voiceConnection) {
