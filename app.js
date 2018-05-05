@@ -65,7 +65,7 @@ client.on('message', async message => {
     // Check for soundboard command first
     if(soundCommands.includes(command)) {
         if (!message.member.voiceChannel) {
-            message.channel.sendMessage("Go in a voice channel, dummy.");
+            message.channel.send("Go in a voice channel, dummy.");
             return;
         } else {
             if (!message.guild.voiceConnection) {
