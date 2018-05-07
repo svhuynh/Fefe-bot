@@ -1,8 +1,10 @@
-const tokenConfig = require("./token.json");
-const botConfig = require("./config.json");
-const Discord = require('discord.js');
-const fs = require('fs');
-const YTDL = require("ytdl-core");
+import botConfig from "./config.json";
+import tokenConfig from "./token.json";
+import Discord from "discord.js";
+import fs from "fs";
+import YTDL from "ytdl-core";
+import soundLinks from "./sounds.json";
+
 
 const client  = new Discord.Client({disableEveryone: true});
 
@@ -10,8 +12,9 @@ client.commands = new Discord.Collection();
 
 var queue = [];
 var currentDispatcher = null;
+var currentVoiceChannel = null;
 
-const soundLinks = require("./sounds.json");
+
 
 
 // Plays a local sound file
@@ -33,22 +36,38 @@ function localPlay(client, message) {
     //         }
     //     //}
     // })
-     if (queue[0]) {
-            localPlay(client, message);
+    if (queue[0]) {
+        localPlay(client, message);
     } else {            
         return;
     }
 }
 
+function disconnectVoiceChannel(voiceChannel) {
+    if(voiceChannel === null) {
+        return null;
+    } else {
+        if(voiceChannel.members.size === 0) {
+
+        }
+    }
+}
+
+function startTimer() {
+    return setInterval(() => {
+
+    }, 60000);
+}
+
 // File reader for scanning existing command files 
-fs.readdir('./command_managers/', (err, files) =>{
-    if(err){
+fs.readdir("./command_managers/", (err, files) =>{
+    if(err) {
         //TODO: Add a logger
         console.log(err);
     }
 
     let commandFiles = files.filter(f => f.split(".").pop() === "js")
-    if(commandFiles.length <= 0){
+    if(commandFiles.length <= 0) {
         console.log("Command files not found");
         return;
     } 
@@ -57,19 +76,19 @@ fs.readdir('./command_managers/', (err, files) =>{
         let props = require(`./command_managers/${f}`);
         console.log(`${f} loaded`);
         client.commands.set(props.help.name, props);
-    })
+    });
     
 
 
 })
 
 
-client.on('ready', async () => {
+client.on("ready", async () => {
     console.log(`${client.user.username} is online!`);
 });
 
 // On message reception
-client.on('message', async message => {
+client.on("message", async message => {
 
     let prefix = botConfig.prefix;
     let messageArray = message.content.split(" ");
@@ -96,8 +115,10 @@ client.on('message', async message => {
                 return;
             } else {
                 if (!message.guild.voiceConnection) {
+                    currentVoiceChannel = message.guild.voiceConnection;
                     message.member.voiceChannel.join().then(function (connection) {
-                        localPlay(client);                                
+                        localPlay(client);
+                        
                     });
                 } else {
                     if(queue.length !== 0)
