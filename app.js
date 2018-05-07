@@ -2,6 +2,7 @@ const tokenConfig = require("./token.json");
 const botConfig = require("./config.json");
 const Discord = require('discord.js');
 const fs = require('fs');
+const YTDL = require("ytdl-core");
 
 const client  = new Discord.Client({disableEveryone: true});
 
@@ -10,18 +11,20 @@ client.commands = new Discord.Collection();
 var queue = [];
 var currentDispatcher = null;
 
+const soundLinks = require("./sounds.json");
+
 const soundCommands = ["m", "nook"];
 const NOOK_FILE = "Animal Crossing - Tom Nook's Theme.mp3";
 const MONKEY_FILE = "monkey_sound_effect.mp3";
 
 // Plays a local sound file
 function localPlay(client, message) {
-    let fileName = queue.shift();
+    let youtubeLink = queue.shift();
     console.log(queue);
     const broadcast = client.createVoiceBroadcast();
-    broadcast.playFile(`./${fileName}`);
     for (const connection of client.voiceConnections.values()) {
-        currentDispatcher = connection.playBroadcast(broadcast);
+        // See YTDL doc to see options
+        currentDispatcher = connection.playStream(YTDL(youtubeLink, {filter: "audioonly"}));
     }
     // localPlay(client);
     // currentDispatcher.on("end", function(){
@@ -34,7 +37,7 @@ function localPlay(client, message) {
     //     //}
     // })
      if (queue[0]) {
-            localPlay(client);
+            localPlay(client, message);
     } else {            
         return;
     }
@@ -87,19 +90,9 @@ client.on('message', async message => {
         
     
         // Check for soundboard command first
-        if(soundCommands.includes(command)) {
-            //Add sound to queue 
-            switch (command) {
-                case "nook":
-                    queue.push(NOOK_FILE);
-                    break;
-                case "m":
-                    queue.push(MONKEY_FILE);
-                    break;
-                default:
-                    break;
-            }
+        if (soundLinks.hasOwnProperty(command)) {
             
+            queue.push(soundLinks[command]);
             if (!message.member.voiceChannel) {
                 message.channel.send(`${message.author.username}, go in a voice channel, you monkey.`);
                 message.delete(10);
