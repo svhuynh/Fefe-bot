@@ -13,9 +13,6 @@ var currentDispatcher = null;
 
 const soundLinks = require("./sounds.json");
 
-const soundCommands = ["m", "nook"];
-const NOOK_FILE = "Animal Crossing - Tom Nook's Theme.mp3";
-const MONKEY_FILE = "monkey_sound_effect.mp3";
 
 // Plays a local sound file
 function localPlay(client, message) {
