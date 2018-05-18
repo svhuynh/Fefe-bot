@@ -1,9 +1,9 @@
-import botConfig from "./config.json";
-import tokenConfig from "./token.json";
-import Discord from "discord.js";
-import fs from "fs";
-import YTDL from "ytdl-core";
-import soundLinks from "./sounds.json";
+const tokenConfig = require("./token.json");
+const botConfig = require("./config.json");
+const Discord = require('discord.js');
+const fs = require('fs');
+const ytdl = require("ytdl-core");
+const soundLinks = require("./sounds.json");
 
 
 const client  = new Discord.Client({disableEveryone: true});
@@ -11,7 +11,6 @@ const client  = new Discord.Client({disableEveryone: true});
 client.commands = new Discord.Collection();
 
 var queue = [];
-var currentDispatcher = null;
 var currentVoiceChannel = null;
 
 
@@ -21,21 +20,11 @@ var currentVoiceChannel = null;
 function localPlay(client, message) {
     let youtubeLink = queue.shift();
     console.log(queue);
-    const broadcast = client.createVoiceBroadcast();
+    client.createVoiceBroadcast();
     for (const connection of client.voiceConnections.values()) {
         // See YTDL doc to see options
-        currentDispatcher = connection.playStream(YTDL(youtubeLink, {filter: "audioonly"}));
+        connection.playStream(ytdl(youtubeLink, {filter: "audioonly"}));
     }
-    // localPlay(client);
-    // currentDispatcher.on("end", function(){
-    //     // if (queue[0]) {
-    //     //     localPlay(client);
-    //     // } else {            
-    //         for (const connection of client.voiceConnections.values()) {
-    //             connection.disconnect();
-    //         }
-    //     //}
-    // })
     if (queue[0]) {
         localPlay(client, message);
     } else {            
@@ -48,14 +37,17 @@ function disconnectVoiceChannel(voiceChannel) {
         return null;
     } else {
         if(voiceChannel.members.size === 0) {
-
+            for (const connection of client.voiceConnections.values()) {
+                connection.disconnect();
+            }
+            
         }
     }
 }
 
 function startTimer() {
     return setInterval(() => {
-
+        disconnectVoiceChannel(currentVoiceChannel);
     }, 60000);
 }
 
@@ -80,11 +72,12 @@ fs.readdir("./command_managers/", (err, files) =>{
     
 
 
-})
+});
 
 
 client.on("ready", async () => {
     console.log(`${client.user.username} is online!`);
+    startTimer();
 });
 
 // On message reception
@@ -118,6 +111,7 @@ client.on("message", async message => {
                     currentVoiceChannel = message.guild.voiceConnection;
                     message.member.voiceChannel.join().then(function (connection) {
                         localPlay(client);
+                        
                         
                     });
                 } else {
