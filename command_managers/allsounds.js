@@ -17,10 +17,6 @@ module.exports.run = async (bot, message, args) => {
     var unassociatedPromises = [];
     for(command in soundLinks) {
         let promise = ytdl.getInfo(soundLinks[command]);
-        // let promise = ytdl.getInfo(soundLinks[command]).then( info => {
-        //     fieldValues[command] = info.title;
-        // });
-
         videoPromises[command] = promise;
         unassociatedPromises.push(promise);
     }
@@ -32,10 +28,11 @@ module.exports.run = async (bot, message, args) => {
             value.then(info => {
                 videoTitle = info.title;
                 console.log(info.title);
-                embed.addField(key, `[${videoTitle}](${soundLinks[key]})`);
+                embed.addField(`command: ,${key}`, `Sound title: [${videoTitle}](${soundLinks[key]})`).addBlankField(true);
+                
                 promiseResolvedCounter++;
                 if (promiseResolvedCounter === jsonFileSize) {
-                    message.channel.send(embed);
+                    message.author.send(embed);
                     console.log("check");
                 }
             });
@@ -53,5 +50,6 @@ module.exports.run = async (bot, message, args) => {
 }
 
 module.exports.help = {
-    name: "allsounds"
+    name: "allsounds",
+    description: "This command lists all available soundbytes. The lists includes the command, the title of the YT video in question, and a link to video."
 }

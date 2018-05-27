@@ -96,6 +96,7 @@ client.on("message", async message => {
 
         const args = message.content.slice(botConfig.prefix.length).trim().split(/ +/g);
         const command = args.shift().toLowerCase();
+        console.log("command received: " + command);
         
     
         // Check for soundboard command first
